@@ -56,9 +56,7 @@ def main(net_path):
 
 
     test_logs = []
-    rec_time = 0
-    # ds_test = ImageDataFlow(opt.test_dir, opt.mask_root, opt.mask_name, mask_idx=opt.mask_idx, is_training=False)
-    # loader = DataLoader(dataset=ds_test, batch_size=1, shuffle=False)
+    rec_time = 0 
 
     model.eval()
     with torch.no_grad():
