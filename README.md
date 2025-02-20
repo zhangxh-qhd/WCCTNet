@@ -8,7 +8,7 @@ To train WCCTNet on fastMRI: python train.py
 To test WCCTNet on fastMRI: python test.py  
 
 To train WCCTNet on CC datast: 
-```python train_CC.py ``` 
+`python train_CC.py <br> '
 To test WCCTNet on CC dataset: python test_CC.py  
 
 
