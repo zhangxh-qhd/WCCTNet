@@ -8,20 +8,17 @@ import datetime
 import torch.nn.modules.loss as Loss
 from torch import optim
 import logging
-
 from data_fastMRI.mri_data import *
 from data_fastMRI.subsample import create_mask_for_mask_type
 import evaluate
 from model import *
 from configs import config
 
-
 logging.basicConfig(
     format='%(asctime)s - %(message)s',
     datefmt='%d-%b-%y %H:%M:%S',
     level=logging.INFO
 )
-
 
 def set_seeds(seed):
     """Set the seeds for reproducibility
