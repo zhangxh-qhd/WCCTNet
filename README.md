@@ -7,7 +7,11 @@ Pytorch Code for the paper "基于小波域的复数卷积和复数Transformer�
 ## Training and Testing
 Use different configs files for fastMRI dataset (configs) and Calgary Campinas single-channel (CC) dataset  (configs_cc)
 
-please modify the trainDir and validDir in the configs.py or configs_cc.py according to your dataset path  
+please modify the filepath in the configs.py or configs_cc.py according to your dataset path  
+```path setting
+   trainDir = "XXX"   your train datasets
+   validDir = "XXX"   your valid datasets
+```
 
 ## train WCCTNet on the fastMRI dataset: 
 ``` train
