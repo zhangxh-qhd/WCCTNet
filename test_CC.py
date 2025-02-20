@@ -10,12 +10,8 @@ from data_cc.select_mask import define_Mask
 from data_cc import utils_image as util
 from model import *
 from configs_cc import config
-
-
 import lpips
 from pytorch_fid import fid_score
-print(dir(fid_score))
-
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -29,9 +25,7 @@ def network_params(model):
     # print('# The number of net parameters:', sum(param.numel() for param in model.parameters()))
     return num_params
 
-mag = lambda x: (x[:, 0:1, ...] ** 2 + x[:, 1:2, :] ** 2) ** 0.5
-normalize1 = lambda img: (img - img.min()) / (img.max() - img.min())
-normalize = lambda img: img / img.max()
+normalize = lambda img: (img - img.min()) / (img.max() - img.min())
 
 def complex_abs(data):
     """
@@ -114,12 +108,7 @@ def main(net_path, method="WCCTNet"):
             # evaluate lpips
             lpips_ = util.calculate_lpips_single(loss_fn_alex, magx_target, magx_pred)
             lpips_ = lpips_.data.squeeze().float().cpu().numpy()
-
-            # evaluate lpips zf
-            zf_lpips_ = util.calculate_lpips_single(loss_fn_alex, magx_target, magx_zf)
-            zf_lpips_ = zf_lpips_.data.squeeze().float().cpu().numpy()
-
-
+         
             diff_pred_x10 = normalize(torch.mul(torch.abs(torch.sub(magx_target, magx_pred)), 10))
 
             magx_target = magx_target.data.squeeze().float().cpu().numpy()
@@ -129,7 +118,6 @@ def main(net_path, method="WCCTNet"):
             psnr = util.calculate_psnr_single(magx_target, magx_pred)
             ssim = util.calculate_ssim_single(magx_target, magx_pred)
             nrmse = util.calculate_nrmse_single(magx_target, magx_pred)
-
 
             test_results['psnr'].append(psnr)
             test_results['ssim'].append(ssim)
