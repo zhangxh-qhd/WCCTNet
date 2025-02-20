@@ -9,8 +9,8 @@ Use different configs files for fastMRI dataset (configs) and Calgary Campinas s
 
 please modify the filepath in the configs.py or configs_cc.py according to your dataset path  
 ```path setting
-   trainDir = "XXX"   your train datasets
-   validDir = "XXX"   your valid datasets
+   trainDir = "XXX"   your training set path
+   validDir = "XXX"   your validation set path
 ```
 
 ## train WCCTNet on the fastMRI dataset: 
