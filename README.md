@@ -28,16 +28,3 @@ python test_CC.py
 We give acknowledgements to [fastMRI](https://github.com/facebookresearch/fastMRI), [Restormer](https://github.com/swz30/Restormer), 
 [SwinMR](https://github.com/ayanglab/SwinMR), and [ReconFormer](https://github.com/guopengf/ReconFormer).
 
-This repository is based on:
-``` bash
-fastMRI: An Open Dataset and Benchmarks for Accelerated MRI (code and paper);
-```
-```bash
-SwinMR: Swin Transformer for Fast MRI (code and paper);
-````
-```bash
-Restormer: Efficient Transformer for High-Resolution Image Restoration (code and paper);
-```
-```bash
-ReconFormer: Accelerated MRI Reconstruction Using Recurrent Transformer (code and paper).
-```
