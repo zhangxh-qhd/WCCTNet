@@ -7,8 +7,10 @@ Use different options (configs files) for fastMRI dataset and Calgary Campinas s
 To train WCCTNet on fastMRI: python train.py  
 To test WCCTNet on fastMRI: python test.py  
 
-To train WCCTNet on CC datast: <br>
-`python train_CC.py ` <br>
+## train WCCTNet on CC datast:
+``` train
+python train_CC.py
+```
 To test WCCTNet on CC dataset:<br> 
 `python test_CC.py` 
 
