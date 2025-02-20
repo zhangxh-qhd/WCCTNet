@@ -57,9 +57,6 @@ def fft_Realmap(x):
     return fft_x_real, fft_x_imag
 
 
-mag = lambda x: (x[:, 0:1, ...] ** 2 + x[:, 1:2, ...] ** 2) ** 0.5
-
-
 def train_epoch(net, optimizer, loss_criterion, tr_dataloader, epoch, scheduler):
 
     """Train for one epoch of the data
