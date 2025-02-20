@@ -4,8 +4,7 @@ class Config(object):
     """Global Config class"""
 
     # Dataset configs
-    spatial_dimentions = 2
-    # input_shape = (256, 256, 2)  # (x_dim, y_dim, z_dim, real-imag)
+    spatial_dimentions = 2   
     in_channels = 1
     out_channels = 1
     dims = 32
