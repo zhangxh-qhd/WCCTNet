@@ -42,7 +42,7 @@ def cidwt2_haar(data, w):
     data_i = idwt2_haar(data_i, w)
     coeffs = torch.stack([data_r, data_i], -1)
     return coeffs
-
+    
 
 #########################################################################
 ## Layer Norm
@@ -107,8 +107,7 @@ class CDownsample(nn.Module):
 
     def forward(self, x):
         x = self.conv(x)
-        x = F.pixel_unshuffle(x.permute(0, 4, 1, 2, 3), 2).permute(0, 2, 3, 4, 1)
-        # print("x_down:", x.shape)
+        x = F.pixel_unshuffle(x.permute(0, 4, 1, 2, 3), 2).permute(0, 2, 3, 4, 1)      
         return x
 
 class CUpsample(nn.Module):
@@ -119,63 +118,6 @@ class CUpsample(nn.Module):
         x = self.conv(x)
         x = F.pixel_shuffle(x.permute(0, 4, 1, 2, 3), 2).permute(0, 2, 3, 4, 1)
         return x
-
-
-
-class CDownsample1(nn.Module):
-    def __init__(self, n_feat):
-        super(CDownsample1, self).__init__()
-
-        self.real = nn.Sequential(nn.Conv2d(n_feat, n_feat // 2, kernel_size=3, stride=1, padding=1, bias=False),
-                                  nn.PixelUnshuffle(2))
-
-        self.imag = nn.Sequential(nn.Conv2d(n_feat, n_feat // 2, kernel_size=3, stride=1, padding=1, bias=False),
-                                  nn.PixelUnshuffle(2))
-
-
-    def forward(self, x):
-        x_r, x_i = torch.unbind(x, -1)
-        x_r = self.real(x_r)
-        x_i = self.imag(x_i)
-        return torch.stack([x_r, x_i], -1)
-
-class CUpsample1(nn.Module):
-    def __init__(self, n_feat):
-        super(CUpsample1, self).__init__()
-
-        self.real = nn.Sequential(nn.Conv2d(n_feat, n_feat*2, kernel_size=3, stride=1, padding=1, bias=False),
-                                  nn.PixelShuffle(2)
-                                  )
-        self.imag = nn.Sequential(nn.Conv2d(n_feat, n_feat * 2, kernel_size=3, stride=1, padding=1, bias=False),
-                                  nn.PixelShuffle(2)
-                                 )
-
-
-    def forward(self, x):
-        x_r, x_i = torch.unbind(x, -1)
-        x_r = self.real(x_r)
-        x_i = self.imag(x_i)
-        return torch.stack([x_r, x_i], -1)
-
-def real_imag_to_mag_phase(data):
-    """
-    :param data (torch.Tensor): A tuple (real, imag)
-    :return: Mag and Phase (torch.Tensor):
-    """
-    mag = (data[0] ** 2 + data[1] ** 2).sqrt()
-    phase = torch.atan2(data[1], data[0])
-    return [mag, phase]
-
-
-def mag_phase_to_real_imag(data):
-    """
-    :param data (torch.Tensor): A tuple (Mag, Phase):
-    :return: real and imag
-    """
-    real = data[0] * torch.cos(data[1])
-    imag = data[0] * torch.sin(data[1])
-    return [real, imag]
-
 
 def fft_layer_complex(x, norm="ortho"):
     # x is 5_ndim(the last dim is 2: real-imag), mask is 4_ndim
@@ -191,89 +133,6 @@ def ifft_layer_complex(x, norm="ortho"):
     x_ifft = torch.stack([x_ifft.real, x_ifft.imag], -1)
     # print("x_ifft.shape=", x_ifft.shape)
     return x_ifft
-
-
-def fft_layer(x):
-    # x is 4_ndim(the seconf dim is 2: real-imag), mask is 4_ndim
-
-    x_fft = torch.fft.rfft2(x)
-    x_fft = torch.cat([x_fft.real, x_fft.imag], 1)
-    return x_fft
-
-def ifft_layer(x):
-    # x is 4_ndim(the last dim is 2: real-imag), mask is 4_ndim
-    x_r, x_i = torch.unbind(x, 1)
-    x_ifft = torch.fft.irfft2(torch.complex(x_r, x_i))
-    return x_ifft
-
-
-def fft_shift_complex(x):
-    x_real, x_imag = torch.unbind(x, -1)
-    x_complex = torch.complex(x_real, x_imag)
-    x_fft = torch.fft.fftshift(torch.fft.fft2(x_complex))
-    x_fft = torch.cat([x_fft.real, x_fft.imag], 1)
-    return x_fft
-
-def data_consistency(k, k0, mask, noise_lvl=None):
-    """
-    k    - input in k-space
-    k0   - initially sampled elements in k-space
-    mask - corresponding nonzero location
-    """
-    v = noise_lvl
-    if v:  # noisy case
-        out = (1 - mask) * k + mask * (k + v * k0) / (1 + v)
-    else:  # noiseless case
-        out = (1 - mask) * k + k0
-    return out
-
-
-class DataConsistency(nn.Module):
-    """ Create data consistency operator
-    Warning: note that FFT2 (by the default of torch.fft) is applied to the last 2 axes of the input.
-    This method detects if the input tensor is 4-dim (2D data) or 5-dim (3D data)
-    and applies FFT2 to the (nx, ny) axis.
-    """
-
-    def __init__(self, noise_lvl=None):
-        super(DataConsistency, self).__init__()
-        self.noise_lvl = noise_lvl
-
-    def forward(self, *input, **kwargs):
-        return self.perform(*input)
-
-    def perform(self, x, k0, mask):
-        """
-        x    - input in image domain, of shape (n, 2, nx, ny[, nt])
-        k0   - initially sampled elements in k-space
-        mask - corresponding nonzero location
-        """
-        # mag = lambda x: (x[..., 0] ** 2 + x[..., 1] ** 2) ** 0.5
-
-        k = fft_shift_complex(x)
-
-        if k0.shape[1] != k.shape[1]:
-            k0 = k0.permute(0, 3, 1, 2)
-            mask = mask.permute(0, 3, 1, 2)
-
-        # print(k.shape, k0.shape, mask.shape)
-
-        v = self.noise_lvl
-        if v:  # noisy case
-            out = (1 - mask) * k + mask * (k + v * k0) / (1 + v)
-        else:  # noiseless case
-            out = (1 - mask) * k + k0
-
-        x_res = torch.fft.ifft2(torch.fft.ifftshift(torch.complex(out[:, 0:1, ...], out[:, 1:2, ...])))
-        x_res = torch.cat((x_res.real, x_res.imag), 1)
-
-        if x_res.dim() == 4:
-            x_res = x_res.permute(0, 2, 3, 1)
-            x_res = x_res.unsqueeze(1)
-        elif x_res.dim() == 5:
-            x_res = x_res.permute(0, 4, 2, 3, 1)
-
-        return x_res
 
 class CReLU(nn.ReLU):
     def __init__(self, inplace: bool=False):
