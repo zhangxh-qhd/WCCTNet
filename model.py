@@ -1,4 +1,3 @@
-
 import math
 import torch
 import torch.nn as nn
@@ -9,15 +8,12 @@ import numbers
 from einops import rearrange
 
 
-
-
 def generate_w():
     w = torch.tensor([[[1., 1.], [1., 1.]],
                       [[1., 1.], [-1., -1.]],
                       [[1., -1.], [1., -1.]],
                       [[1., -1.], [-1., 1.]]]).reshape(4, 1, 2, 2)
     return 0.5 * w
-
 
 def dwt2_haar(data, w):
     coeff = []
