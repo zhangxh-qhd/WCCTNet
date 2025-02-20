@@ -1,7 +1,6 @@
 from __future__ import print_function
 from typing import Tuple
 import shutil
-
 from tqdm import tqdm
 import torch
 import time
@@ -10,7 +9,6 @@ import torch.nn.modules.loss as Loss
 from torch import optim
 from torch.utils.data import DataLoader
 import logging
-
 from data_cc.dataset_CC import *
 from data_cc.select_mask import define_Mask
 from evaluate import *
@@ -22,8 +20,6 @@ torch.backends.cudnn.enabled = False
 torch.backends.cudnn.deterministic = False
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-
-
 
 logging.basicConfig(
     format='%(asctime)s - %(message)s',
