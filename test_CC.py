@@ -54,10 +54,7 @@ def main(net_path, method="WCCTNet"):
     torch.random.manual_seed(42)
     print('Loading model ...')
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
-    # net = CRestormer(in_channels=config.in_channels,
-    #               x_pred_channels=config.x_pred_channels,
-    #               dim=config.dims)
+   
     net = CUnet(in_channels=config.in_channels,
                   out_channels=config.out_channels,
                   dim=config.dims)
@@ -104,13 +101,12 @@ def main(net_path, method="WCCTNet"):
             magx_pred, magx_target, magx_zf = complex_abs(x_pred), complex_abs(x_target), complex_abs(x_zf)
             test_loss = F.l1_loss(magx_pred, magx_target)
             test_results["test_loss"].append(test_loss.detach().cpu().numpy())
-
+            
             # evaluate lpips
             lpips_ = util.calculate_lpips_single(loss_fn_alex, magx_target, magx_pred)
-            lpips_ = lpips_.data.squeeze().float().cpu().numpy()
-         
+            lpips_ = lpips_.data.squeeze().float().cpu().numpy()         
             diff_pred_x10 = normalize(torch.mul(torch.abs(torch.sub(magx_target, magx_pred)), 10))
-
+            
             magx_target = magx_target.data.squeeze().float().cpu().numpy()
             magx_pred = magx_pred.data.squeeze().float().cpu().numpy()
 
@@ -124,15 +120,13 @@ def main(net_path, method="WCCTNet"):
             test_results['nrmse'].append(nrmse)
             test_results['lpips'].append(lpips_)
 
-
             diff_pred_x10 = diff_pred_x10.data.squeeze().float().cpu().clamp_(0, 1).numpy()
+            diff_pred_x10 = (diff_pred_x10 * 255.0).round().astype(np.uint8)  # float32 to uint8
 
             magx_target = (np.clip(normalize(magx_target), 0, 1) * 255.0).round().astype(np.uint8)  # float32 to uint8
             magx_pred = (np.clip(normalize(magx_pred), 0, 1) * 255.0).round().astype(np.uint8)  # float32 to uint8
 
-            diff_pred_x10 = (diff_pred_x10 * 255.0).round().astype(np.uint8)  # float32 to uint8
-
-
+          
             isExists = os.path.exists(os.path.join(config.test_resultDir, 'GT'))
             if not isExists:
                 os.makedirs(os.path.join(config.test_resultDir, 'GT'))
