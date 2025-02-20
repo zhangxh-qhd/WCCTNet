@@ -39,9 +39,7 @@ class Config(object):
     betas = (0.9, 0.999)
     weight_decay = 0
 
-    save_dir = 'trainResult/WCCTNet_CC'
-
-    # models_dir = os.path.join(save_dir, "generalization", "models/")
+    save_dir = 'trainResult/WCCTNet_CC'   
     models_dir = os.path.join(save_dir,  mask_name, 'models/')
     workspace_dir = os.path.join(save_dir, mask_name, 'workspace/')
     img_dir = os.path.join(save_dir,  mask_name, 'image/')
