@@ -18,6 +18,7 @@ validDir = "xxx/xxx/xxx/xxx"   validation set path
 python train.py
 ```
 ## test WCCTNet on the fastMRI dataset: 
+(Download [pre-trained weights]https://pan.baidu.com/s/1-bdOL2r7HCQK8gjc555wQw 提取码: 2502)
 ``` test
 python test.py
 ```
